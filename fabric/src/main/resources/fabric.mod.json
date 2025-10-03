@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "id": "spellwheel",
+  "version": "${version}",
+  "name": "Hex Spell Wheel",
+  "description": "An addon for Hex Casting (1.20.1) that allows you to open a wheel menu to select a spell book page!",
+  "authors": [
+    "DrTheo_"
+  ],
+  "contributors": [
+    "Manchick (original wheel code)",
+    "OuroborosGames (logo)"
+  ],
+  "contact": {
+    "issues": "https://github.com/drtheodor/hex-spell-wheel/issues",
+    "sources": "https://github.com/drtheodor/hex-spell-wheel",
+    "homepage": "https://modrinth.com/project/hex-spell-wheel"
+  },
+  "license": "MIT",
+  "icon": "assets/spellwheel/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "main": [
+      "dev.drtheo.spellwheel.fabric.SpellWheelFabric"
+    ],
+    "client": [
+      "dev.drtheo.spellwheel.fabric.client.SpellWheelFabricClient"
+    ]
+  },
+  "mixins": [
+    "spellwheel.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.16.10",
+    "minecraft": "~1.20.1",
+    "architectury": ">=9.2.14",
+    "hexcasting": "*"
+  }
+}

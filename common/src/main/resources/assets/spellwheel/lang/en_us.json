@@ -1,0 +1,8 @@
+{
+  "widget.spellwheel.page": "Page %s",
+  "widget.spellwheel.chapter": "Chapter %s",
+  "widget.spellwheel.empty": "Empty",
+  "widget.spellwheel.empty.desc": "Not assigned.",
+  "key.spellwheel.open": "Open Spellbook Wheel",
+  "category.spellwheel.main": "Hex Spell Wheel"
+}
