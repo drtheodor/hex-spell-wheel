@@ -5,6 +5,11 @@ import com.mojang.blaze3d.platform.InputConstants;
 import dev.architectury.event.events.client.ClientTickEvent;
 import dev.architectury.registry.client.keymappings.KeyMappingRegistry;
 import dev.drtheo.spellwheel.SpellWheelClient;
+import dev.drtheo.spellwheel.client.ui.WheelScreen;
+import dev.drtheo.spellwheel.client.ui.Widget;
+import dev.drtheo.spellwheel.client.ui.WidgetSet;
+import dev.drtheo.spellwheel.client.ui.action.OpenAction;
+import dev.drtheo.spellwheel.client.ui.action.SwitchPageAction;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
@@ -12,9 +17,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class WheelKeybinds {
 
@@ -27,7 +29,7 @@ public class WheelKeybinds {
         KeyMappingRegistry.register(OPEN_SPELL_WHEEL);
 
         ClientTickEvent.CLIENT_POST.register(minecraft -> {
-            if (OPEN_SPELL_WHEEL.consumeClick() && !(minecraft.screen instanceof WheelScreen)) {
+            if (minecraft.player != null && OPEN_SPELL_WHEEL.consumeClick() && !(minecraft.screen instanceof WheelScreen)) {
                 ItemStack spellBook = SpellWheelClient.getSpellbook(minecraft.player);
 
                 if (spellBook == null) return;
@@ -39,19 +41,19 @@ public class WheelKeybinds {
                 boolean[] realPages = SpellWheelClient.getRealPages(spellBook);
                 MutableComponent[] names = SpellWheelClient.getPageNames(spellBook);
 
-                List<Widget> widgets = maxPage > 9 ? buildChapters(realPages, names, maxPage) : buildPages(realPages, names, 0, maxPage);
-                Minecraft.getInstance().setScreen(new WheelScreen("spellbook", WidgetSet.create(widgets)));
+                Widget[] widgets = maxPage > WidgetSet.SET_SIZE ? buildChapters(realPages, names, maxPage) : buildPages(realPages, names, 0, maxPage);
+                Minecraft.getInstance().setScreen(new WheelScreen(WidgetSet.create(widgets)));
             }
         });
     }
 
-    private static List<Widget> buildChapters(boolean[] realPages, MutableComponent[] names, int maxPages) {
-        int chapters = Math.min((int) Math.ceil(maxPages / 9d), 9);
-        List<Widget> widgets = new ArrayList<>(chapters);
+    private static Widget[] buildChapters(boolean[] realPages, MutableComponent[] names, int maxPages) {
+        int chapters = Math.min((int) Math.ceil(maxPages / (double) WidgetSet.SET_SIZE), WidgetSet.SET_SIZE);
+        Widget[] widgets = new Widget[chapters];
 
         for (int i = 0; i < chapters; i++) {
-            int pageOffset = i * 9;
-            int maxChapterPage = Math.min(pageOffset + 9, realPages.length);
+            int pageOffset = i * WidgetSet.SET_SIZE;
+            int maxChapterPage = Math.min(pageOffset + WidgetSet.SET_SIZE, realPages.length);
 
             MutableComponent label = I18n.chapter(i);
 
@@ -63,24 +65,25 @@ public class WheelKeybinds {
                         .withStyle(ChatFormatting.GRAY));
             }
 
-            widgets.add(new Widget(label, Items.BOOK, OpenAction.create("chapter",
-                    () -> buildPages(realPages, names, pageOffset, maxChapterPage))));
+            widgets[i] = new Widget(label, Items.BOOK, OpenAction.create(
+                    () -> buildPages(realPages, names, pageOffset, maxPages)));
         }
 
         return widgets;
     }
 
-    private static List<Widget> buildPages(boolean[] realPages, MutableComponent[] names, int start, int maxPages) {
-        List<Widget> widgets = new ArrayList<>(maxPages);
+    private static Widget[] buildPages(boolean[] realPages, MutableComponent[] names, int start, int maxPages) {
+        Widget[] widgets = new Widget[maxPages - start];
 
-        for (int i = start; i < Math.min(maxPages, realPages.length); i++) {
+        for (int i = start; i < maxPages; i++) {
             if (!realPages[i]) continue;
 
             MutableComponent label = I18n.page(i);
 
-            if (names[i] != null) label = names[i].append("\n").append(label.withStyle(ChatFormatting.GRAY));
+            if (names[i] != null)
+                label = names[i].append("\n").append(label.withStyle(ChatFormatting.GRAY));
 
-            widgets.add(new Widget(label, Items.PAPER, new SwitchPageAction(i + 1)));
+            widgets[i - start] = new Widget(label, Items.PAPER, new SwitchPageAction(i + 1));
         }
 
         return widgets;

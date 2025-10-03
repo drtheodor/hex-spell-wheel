@@ -1,4 +1,4 @@
-package dev.drtheo.spellwheel.client;
+package dev.drtheo.spellwheel.client.ui.action;
 
 import at.petrak.hexcasting.common.items.storage.ItemSpellbook;
 import at.petrak.hexcasting.common.msgs.MsgShiftScrollC2S;
@@ -6,7 +6,7 @@ import at.petrak.hexcasting.xplat.IClientXplatAbstractions;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.item.ItemStack;
 
-public class SwitchPageAction extends Action {
+public class SwitchPageAction implements Action {
 
     private final int targetPage;
 

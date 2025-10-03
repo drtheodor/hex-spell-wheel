@@ -1,6 +1,5 @@
-package dev.drtheo.spellwheel.client;
+package dev.drtheo.spellwheel.client.ui;
 
-import com.mojang.serialization.Codec;
 import net.minecraft.util.StringRepresentable;
 import org.jetbrains.annotations.NotNull;
 
@@ -14,6 +13,8 @@ public enum WidgetSlot implements StringRepresentable {
     BOTTOM_LEFT(-49, 21, -8, 8),
     BOTTOM(-15, 25, 0, 8),
     BOTTOM_RIGHT(21, 22, 8, 8);
+
+    public static final WidgetSlot[] VALUES = WidgetSlot.values();
 
     final int x;
     final int y;
