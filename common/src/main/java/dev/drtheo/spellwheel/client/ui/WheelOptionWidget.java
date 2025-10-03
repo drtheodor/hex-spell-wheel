@@ -6,7 +6,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Tooltip;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
@@ -77,9 +76,7 @@ public class WheelOptionWidget extends Button {
     public void onPress() {
         Minecraft client = Minecraft.getInstance();
 
-        if (!widget.keepOpened() && !Screen.hasShiftDown())
-            client.screen.onClose();
-
-        widget.run(client);
+        if (client.screen instanceof WheelScreen wheelScreen)
+            wheelScreen.click(widget);
     }
 }

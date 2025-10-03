@@ -5,7 +5,6 @@ import dev.drtheo.spellwheel.client.ui.Widget;
 import dev.drtheo.spellwheel.client.ui.WidgetSet;
 import net.minecraft.client.Minecraft;
 
-import java.util.List;
 import java.util.function.Supplier;
 
 public class OpenAction implements Action {

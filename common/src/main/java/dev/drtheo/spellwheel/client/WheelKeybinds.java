@@ -2,6 +2,8 @@ package dev.drtheo.spellwheel.client;
 
 import at.petrak.hexcasting.common.items.storage.ItemSpellbook;
 import com.mojang.blaze3d.platform.InputConstants;
+import dev.architectury.event.EventResult;
+import dev.architectury.event.events.client.ClientRawInputEvent;
 import dev.architectury.event.events.client.ClientTickEvent;
 import dev.architectury.registry.client.keymappings.KeyMappingRegistry;
 import dev.drtheo.spellwheel.SpellWheelClient;
@@ -28,22 +30,34 @@ public class WheelKeybinds {
     public static void init() {
         KeyMappingRegistry.register(OPEN_SPELL_WHEEL);
 
+        // TODO: find a better way to catch hotbar keys
+        ClientRawInputEvent.KEY_PRESSED.register((client, keyCode, scanCode, action, modifiers) -> {
+            if (!(client.screen instanceof WheelScreen wheelScreen) || action != 1) return EventResult.pass();
+            if (keyCode < InputConstants.KEY_1 || keyCode > InputConstants.KEY_9) return EventResult.pass();
+
+            wheelScreen.simulateClick(keyCode - InputConstants.KEY_1);
+            return EventResult.interruptDefault();
+        });
+
         ClientTickEvent.CLIENT_POST.register(minecraft -> {
-            if (minecraft.player != null && OPEN_SPELL_WHEEL.consumeClick() && !(minecraft.screen instanceof WheelScreen)) {
-                ItemStack spellBook = SpellWheelClient.getSpellbook(minecraft.player);
+            if (minecraft.player == null || minecraft.screen != null)
+                return;
 
-                if (spellBook == null) return;
+            if (!OPEN_SPELL_WHEEL.consumeClick()) return;
 
-                int maxPage = ItemSpellbook.highestPage(spellBook);
+            ItemStack spellBook = SpellWheelClient.getSpellbook(minecraft.player);
 
-                if (maxPage == 0) return;
+            if (spellBook == null) return;
 
-                boolean[] realPages = SpellWheelClient.getRealPages(spellBook);
-                MutableComponent[] names = SpellWheelClient.getPageNames(spellBook);
+            int maxPage = ItemSpellbook.highestPage(spellBook);
 
-                Widget[] widgets = maxPage > WidgetSet.SET_SIZE ? buildChapters(realPages, names, maxPage) : buildPages(realPages, names, 0, maxPage);
-                Minecraft.getInstance().setScreen(new WheelScreen(WidgetSet.create(widgets)));
-            }
+            if (maxPage == 0) return;
+
+            boolean[] realPages = SpellWheelClient.getRealPages(spellBook);
+            MutableComponent[] names = SpellWheelClient.getPageNames(spellBook);
+
+            Widget[] widgets = maxPage > WidgetSet.SET_SIZE ? buildChapters(realPages, names, maxPage) : buildPages(realPages, names, 0, maxPage);
+            Minecraft.getInstance().setScreen(new WheelScreen(WidgetSet.create(widgets)));
         });
     }
 
@@ -55,6 +69,7 @@ public class WheelKeybinds {
             int pageOffset = i * WidgetSet.SET_SIZE;
             int maxChapterPage = Math.min(pageOffset + WidgetSet.SET_SIZE, realPages.length);
 
+            Component prefix = Component.literal((i + 1) + ". ").withStyle(ChatFormatting.GRAY);
             MutableComponent label = I18n.chapter(i);
 
             for (int j = pageOffset; j < maxChapterPage; j++) {
@@ -65,6 +80,7 @@ public class WheelKeybinds {
                         .withStyle(ChatFormatting.GRAY));
             }
 
+            label = Component.empty().append(prefix).append(label);
             widgets[i] = new Widget(label, Items.BOOK, OpenAction.create(
                     () -> buildPages(realPages, names, pageOffset, maxPages)));
         }
@@ -78,11 +94,13 @@ public class WheelKeybinds {
         for (int i = start; i < maxPages; i++) {
             if (!realPages[i]) continue;
 
+            Component prefix = Component.literal((i - start + 1) + ". ").withStyle(ChatFormatting.GRAY);
             MutableComponent label = I18n.page(i);
 
             if (names[i] != null)
                 label = names[i].append("\n").append(label.withStyle(ChatFormatting.GRAY));
 
+            label = Component.empty().append(prefix).append(label);
             widgets[i - start] = new Widget(label, Items.PAPER, new SwitchPageAction(i + 1));
         }
 

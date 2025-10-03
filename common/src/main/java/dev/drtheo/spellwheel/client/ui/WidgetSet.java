@@ -5,7 +5,7 @@ import java.util.function.BiConsumer;
 
 public class WidgetSet {
     public static final int SET_SIZE = 8;
-    private final Widget[] widgets = new Widget[SET_SIZE];
+    protected final Widget[] widgets = new Widget[SET_SIZE];
 
     private WidgetSet() {
         Arrays.fill(widgets, Widget.empty());

@@ -10,9 +10,10 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
 @Mod(SpellWheel.MOD_ID)
 public final class SpellWheelForge {
-    public SpellWheelForge() {
+
+    public SpellWheelForge(FMLJavaModLoadingContext context) {
         // Submit our event bus to let Architectury API register our content on the right time.
-        EventBuses.registerModEventBus(SpellWheel.MOD_ID, FMLJavaModLoadingContext.get().getModEventBus());
+        EventBuses.registerModEventBus(SpellWheel.MOD_ID, context.getModEventBus());
 
         MinecraftForge.EVENT_BUS.addListener(this::onClient);
 
