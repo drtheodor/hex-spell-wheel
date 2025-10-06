@@ -3,6 +3,7 @@ package dev.drtheo.spellwheel;
 import at.petrak.hexcasting.api.utils.NBTHelper;
 import at.petrak.hexcasting.common.items.storage.ItemSpellbook;
 import dev.drtheo.spellwheel.client.WheelKeybinds;
+import dev.drtheo.spellwheel.client.util.ClientScheduler;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -13,6 +14,7 @@ public final class SpellWheelClient {
 
     public static void init() {
         WheelKeybinds.init();
+        ClientScheduler.init();
     }
 
     public static ItemStack getSpellbook(Player player) {
