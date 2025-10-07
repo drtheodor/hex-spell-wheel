@@ -29,7 +29,10 @@ public class IconChangeAction implements Action {
         if (primed) {
             ItemStack stack = client.player.getMainHandItem();
 
-            WheelClientConfig.get().setIcon(name, stack.isEmpty() ? defIcon : stack.getItem());
+            if (stack.isEmpty())
+                stack = new ItemStack(defIcon);
+
+            WheelClientConfig.get().setIcon(name, stack.getItem());
             widget.setPreview(stack);
 
             widget.setHoverColor(Widget.HOVER_COLOR);
