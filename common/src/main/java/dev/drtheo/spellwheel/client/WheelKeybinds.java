@@ -8,6 +8,7 @@ import dev.architectury.registry.client.keymappings.KeyMappingRegistry;
 import dev.drtheo.spellwheel.client.ui.WheelScreen;
 import dev.drtheo.spellwheel.client.util.SpellbookUtil;
 import net.minecraft.client.KeyMapping;
+import net.minecraft.client.Minecraft;
 
 public class WheelKeybinds {
 
@@ -22,6 +23,10 @@ public class WheelKeybinds {
         // TODO: find a better way to catch hotbar keys
         ClientRawInputEvent.KEY_PRESSED.register((client, keyCode, scanCode, action, modifiers) -> {
             if (!(client.screen instanceof WheelScreen wheelScreen) || action != 1) return EventResult.pass();
+            if (Minecraft.getInstance().options.keyInventory.matches(keyCode, scanCode)) {
+                wheelScreen.onClose();
+                return EventResult.interruptDefault();
+            }
             if (keyCode < InputConstants.KEY_1 || keyCode > InputConstants.KEY_9) return EventResult.pass();
 
             wheelScreen.simulateClick(keyCode - InputConstants.KEY_1);
