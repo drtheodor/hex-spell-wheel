@@ -4,11 +4,13 @@ import at.petrak.hexcasting.common.items.magic.ItemPackagedHex;
 import at.petrak.hexcasting.common.items.storage.ItemSpellbook;
 import at.petrak.hexcasting.common.msgs.MsgShiftScrollC2S;
 import at.petrak.hexcasting.xplat.IClientXplatAbstractions;
+import dev.drtheo.spellwheel.client.I18n;
 import dev.drtheo.spellwheel.client.ui.Widget;
 import dev.drtheo.spellwheel.client.util.HandUtil;
 import dev.drtheo.spellwheel.client.util.StackInHand;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 
 public record SwitchPageAction(int targetPage) implements Action {
@@ -49,8 +51,11 @@ public record SwitchPageAction(int targetPage) implements Action {
         InteractionHand trinketHand = spellbook.inverseHand();
         StackInHand trinket = HandUtil.getPriorityItem(ItemPackagedHex.class, trinketHand);
 
-        if (trinket == null)
+        if (trinket == null) {
+            Component itemName = client.player.getItemInHand(trinketHand).getDisplayName();
+            client.player.displayClientMessage(I18n.notArtifact(itemName), true);
             return;
+        }
 
         client.gameMode.useItem(client.player, trinketHand);
     }

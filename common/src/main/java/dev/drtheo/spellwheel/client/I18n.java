@@ -44,4 +44,8 @@ public class I18n {
     public static MutableComponent youSure() {
         return Component.translatable("text." + SpellWheel.MOD_ID + ".you_sure").withStyle(ChatFormatting.YELLOW);
     }
+
+    public static MutableComponent notArtifact(Component name) {
+        return Component.translatable("text." + SpellWheel.MOD_ID + ".not_artifact", name).withStyle(ChatFormatting.RED);
+    }
 }
