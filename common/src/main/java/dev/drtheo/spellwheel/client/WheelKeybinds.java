@@ -13,6 +13,7 @@ import dev.drtheo.spellwheel.client.config.WheelClientConfig;
 import dev.drtheo.spellwheel.client.ui.WheelScreen;
 import dev.drtheo.spellwheel.client.ui.Widget;
 import dev.drtheo.spellwheel.client.ui.WidgetSet;
+import dev.drtheo.spellwheel.client.ui.action.IconChangeAction;
 import dev.drtheo.spellwheel.client.ui.action.OpenAction;
 import dev.drtheo.spellwheel.client.ui.action.SwitchPageAction;
 import net.minecraft.ChatFormatting;
@@ -32,6 +33,8 @@ public class WheelKeybinds {
             I18n.key("open"), InputConstants.Type.KEYSYM,
             InputConstants.KEY_GRAVE, I18n.keyCategory("main")
     );
+
+    public static final Item DEFAULT_ICON = Items.PAPER;
 
     public static void init() {
         KeyMappingRegistry.register(OPEN_SPELL_WHEEL);
@@ -114,13 +117,13 @@ public class WheelKeybinds {
 
     private static Widget createPageWidget(@Nullable MutableComponent name, @Nullable CompoundTag iotas, int page, int offset) {
         MutableComponent label = I18n.numbered(page - offset, I18n.page(name, page));
-        Item icon = name != null ? WheelClientConfig.getIconOr(name.getString(), Items.PAPER) : Items.PAPER;
+        Item icon = WheelClientConfig.get().getIconOr(name, DEFAULT_ICON);
 
         if (iotas != null) {
             Component displayIota = IotaType.getDisplay(iotas);
             label.append("\n").append(Component.translatable("hexcasting.spelldata.onitem", displayIota));
         }
 
-        return new Widget(label, icon, new SwitchPageAction(page));
+        return new Widget(label, icon, new SwitchPageAction(page), new IconChangeAction(name, DEFAULT_ICON));
     }
 }

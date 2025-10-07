@@ -5,5 +5,7 @@
   "widget.spellwheel.empty": "Empty",
   "widget.spellwheel.empty.desc": "Not assigned.",
   "key.spellwheel.open": "Open Spellbook Wheel",
-  "category.spellwheel.main": "Hex Spell Wheel"
+  "category.spellwheel.main": "Hex Spell Wheel",
+  "text.spellwheel.no_icon": "Can't set an icon for an unnamed page!",
+  "text.spellwheel.you_sure": "Are you sure you want to change the icon for this slot?"
 }

@@ -1,18 +1,14 @@
 package dev.drtheo.spellwheel.client.ui;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import dev.drtheo.spellwheel.SpellWheel;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 
 public class WheelOptionWidget extends Button {
-
-    public static final ResourceLocation EMPTY = SpellWheel.id("textures/gui/empty_widget.png");
 
     public final Widget widget;
     private final int xOffset;
@@ -54,8 +50,9 @@ public class WheelOptionWidget extends Button {
     }
 
     protected void renderButton(GuiGraphics context) {
-        boolean displayHovered = isHovered() && widget.actions().isPresent();
-        int color = (180 << 24) | (displayHovered ? 0x3c8527 : 0x2c2c2c);
+        boolean displayHovered = isHovered() && widget.actions() != null;
+        int color = (180 << 24) | (displayHovered ? widget.hoverColor() : widget.currentColor());
+
         int x = getX();
         int y = getY();
         int contentX = x + 8;
@@ -64,12 +61,32 @@ public class WheelOptionWidget extends Button {
         context.fill(x, y, x + width, y + height, color);
         ItemStack preview = widget.preview();
 
-        if (preview.isEmpty()) {
-            context.blit(EMPTY, contentX, contentY, 0, 0, 16, 16, 16, 16);
-            return;
+        context.renderItem(preview, contentX, contentY);
+    }
+
+    @Override
+    public boolean mouseClicked(double d, double e, int i) {
+        if (this.active && this.visible) {
+            if (i == 0 || i == 1) {
+                if (this.clicked(d, e)) {
+                    this.playDownSound(Minecraft.getInstance().getSoundManager());
+
+                    if (i == 0) this.onPress();
+                    else this.onRightPress();
+
+                    return true;
+                }
+            }
         }
 
-        context.renderItem(preview, contentX, contentY);
+        return false;
+    }
+
+    public void onRightPress() {
+        Minecraft client = Minecraft.getInstance();
+
+        if (client.screen instanceof WheelScreen wheelScreen)
+            wheelScreen.rightClick(widget);
     }
 
     @Override

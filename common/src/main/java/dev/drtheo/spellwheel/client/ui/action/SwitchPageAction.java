@@ -4,22 +4,17 @@ import at.petrak.hexcasting.common.items.magic.ItemPackagedHex;
 import at.petrak.hexcasting.common.items.storage.ItemSpellbook;
 import at.petrak.hexcasting.common.msgs.MsgShiftScrollC2S;
 import at.petrak.hexcasting.xplat.IClientXplatAbstractions;
+import dev.drtheo.spellwheel.client.ui.Widget;
 import dev.drtheo.spellwheel.client.util.HandUtil;
 import dev.drtheo.spellwheel.client.util.StackInHand;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.world.InteractionHand;
 
-public class SwitchPageAction implements Action {
-
-    private final int targetPage;
-
-    public SwitchPageAction(int page) {
-        this.targetPage = page;
-    }
+public record SwitchPageAction(int targetPage) implements Action {
 
     @Override
-    public void run(Minecraft client) {
+    public void run(Minecraft client, Widget widget) {
         if (client.player == null)
             return;
 

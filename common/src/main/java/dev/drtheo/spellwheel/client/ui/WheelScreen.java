@@ -24,11 +24,15 @@ public class WheelScreen extends Screen {
         this.click(this.widgets.widgets[index]);
     }
 
-    public void click(Widget widget) {
+    protected void click(Widget widget) {
         if (!widget.keepOpened() && !Screen.hasShiftDown())
             this.onClose();
 
         widget.run(Minecraft.getInstance());
+    }
+
+    protected void rightClick(Widget widget) {
+        widget.runAlt(Minecraft.getInstance());
     }
 
     @Override

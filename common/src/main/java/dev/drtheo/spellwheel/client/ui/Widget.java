@@ -7,22 +7,105 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.Optional;
+import java.util.Objects;
 
-public record Widget(Component label, ItemStack preview, Optional<Action> actions, boolean keepOpened) {
+public final class Widget {
 
     private static final ItemStack EMPTY_STACK = new ItemStack(Items.BARRIER);
 
-    public Widget(Component label, Item item, Action actions) {
-        this(label, new ItemStack(item), Optional.of(actions), false);
+    public static final int DEFAULT_COLOR = 0x2c2c2c;
+    public static final int HOVER_COLOR = 0x3c8527;
+
+    private final Component label;
+    private ItemStack preview;
+
+    private final Action actions;
+    private final boolean keepOpened;
+
+    private int currentColor = DEFAULT_COLOR;
+    private int hoverColor = HOVER_COLOR;
+
+    public Widget(Component label, ItemStack preview, Action actions, boolean keepOpened) {
+        this.label = label;
+        this.preview = preview;
+        this.actions = actions;
+        this.keepOpened = keepOpened;
+    }
+
+    public Widget(Component label, Item item, Action... actions) {
+        this(label, new ItemStack(item), Action.and(actions), false);
     }
 
     public void run(Minecraft client) {
-        actions.ifPresent(action -> action.run(client));
+        if (actions == null)
+            return;
+
+        actions.run(client, this);
+    }
+
+    public void runAlt(Minecraft client) {
+        if (actions == null)
+            return;
+
+        actions.runAlt(client, this);
     }
 
     public static Widget empty() {
-        return new Widget(I18n.emptyWidget(), EMPTY_STACK, Optional.empty(), true);
+        return new Widget(I18n.emptyWidget(), EMPTY_STACK, null, true);
+    }
+
+    public Component label() {
+        return label;
+    }
+
+    public ItemStack preview() {
+        return preview;
+    }
+
+    public void setPreview(ItemStack preview) {
+        this.preview = preview;
+    }
+
+    @Nullable
+    public Action actions() {
+        return actions;
+    }
+
+    public boolean keepOpened() {
+        return keepOpened;
+    }
+
+    public int currentColor() {
+        return currentColor;
+    }
+
+    public int hoverColor() {
+        return hoverColor;
+    }
+
+    public void setCurrentColor(int currentColor) {
+        this.currentColor = currentColor;
+    }
+
+    public void setHoverColor(int hoverColor) {
+        this.hoverColor = hoverColor;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) return true;
+        if (obj == null || obj.getClass() != this.getClass()) return false;
+        var that = (Widget) obj;
+        return Objects.equals(this.label, that.label) &&
+                Objects.equals(this.preview, that.preview) &&
+                Objects.equals(this.actions, that.actions) &&
+                this.keepOpened == that.keepOpened;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(label, preview, actions, keepOpened);
     }
 }
