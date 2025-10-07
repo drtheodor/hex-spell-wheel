@@ -1,5 +1,7 @@
 package dev.drtheo.spellwheel.client;
 
+import at.petrak.hexcasting.api.casting.iota.IotaType;
+import at.petrak.hexcasting.api.utils.NBTHelper;
 import at.petrak.hexcasting.common.items.storage.ItemSpellbook;
 import com.mojang.blaze3d.platform.InputConstants;
 import dev.architectury.event.EventResult;
@@ -7,6 +9,7 @@ import dev.architectury.event.events.client.ClientRawInputEvent;
 import dev.architectury.event.events.client.ClientTickEvent;
 import dev.architectury.registry.client.keymappings.KeyMappingRegistry;
 import dev.drtheo.spellwheel.SpellWheelClient;
+import dev.drtheo.spellwheel.client.config.WheelClientConfig;
 import dev.drtheo.spellwheel.client.ui.WheelScreen;
 import dev.drtheo.spellwheel.client.ui.Widget;
 import dev.drtheo.spellwheel.client.ui.WidgetSet;
@@ -15,10 +18,13 @@ import dev.drtheo.spellwheel.client.ui.action.SwitchPageAction;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import org.jetbrains.annotations.Nullable;
 
 public class WheelKeybinds {
 
@@ -53,57 +59,68 @@ public class WheelKeybinds {
 
             if (maxPage == 0) return;
 
-            boolean[] realPages = SpellWheelClient.getRealPages(spellBook);
+            CompoundTag iotas = NBTHelper.getCompound(spellBook, ItemSpellbook.TAG_PAGES);
             MutableComponent[] names = SpellWheelClient.getPageNames(spellBook);
 
-            Widget[] widgets = maxPage > WidgetSet.SET_SIZE ? buildChapters(realPages, names, maxPage) : buildPages(realPages, names, 0, maxPage);
+            Widget[] widgets = maxPage > WidgetSet.SET_SIZE ? buildChapters(iotas, names, maxPage) : buildPages(iotas, names, 0, maxPage);
             Minecraft.getInstance().setScreen(new WheelScreen(WidgetSet.create(widgets)));
         });
     }
 
-    private static Widget[] buildChapters(boolean[] realPages, MutableComponent[] names, int maxPages) {
+    private static Widget[] buildChapters(CompoundTag iotas, MutableComponent[] names, int maxPages) {
         int chapters = Math.min((int) Math.ceil(maxPages / (double) WidgetSet.SET_SIZE), WidgetSet.SET_SIZE);
         Widget[] widgets = new Widget[chapters];
 
         for (int i = 0; i < chapters; i++) {
             int pageOffset = i * WidgetSet.SET_SIZE;
-            int maxChapterPage = Math.min(pageOffset + WidgetSet.SET_SIZE, realPages.length);
+            int maxChapterPage = Math.min(pageOffset + WidgetSet.SET_SIZE, maxPages);
 
-            Component prefix = Component.literal((i + 1) + ". ").withStyle(ChatFormatting.GRAY);
             MutableComponent label = I18n.chapter(i);
 
             for (int j = pageOffset; j < maxChapterPage; j++) {
-                if (!realPages[j]) continue;
+                int page = j + 1;
+
+                if (!iotas.contains(String.valueOf(page)))
+                    continue;
 
                 label = label.append(Component.literal("\n - ")
-                        .append(names[j] == null ? I18n.page(j) : names[j])
+                        .append(I18n.page(names[j], page))
                         .withStyle(ChatFormatting.GRAY));
             }
 
-            label = Component.empty().append(prefix).append(label);
+            label = I18n.numbered(i + 1, label);
             widgets[i] = new Widget(label, Items.BOOK, OpenAction.create(
-                    () -> buildPages(realPages, names, pageOffset, maxPages)));
+                    () -> buildPages(iotas, names, pageOffset, maxPages)));
         }
 
         return widgets;
     }
 
-    private static Widget[] buildPages(boolean[] realPages, MutableComponent[] names, int start, int maxPages) {
+    private static Widget[] buildPages(CompoundTag iotas, MutableComponent[] names, int start, int maxPages) {
         Widget[] widgets = new Widget[maxPages - start];
 
         for (int i = start; i < maxPages; i++) {
-            if (!realPages[i]) continue;
+            int page = i + 1;
+            CompoundTag tag = (CompoundTag) iotas.get(String.valueOf(page));
 
-            Component prefix = Component.literal((i - start + 1) + ". ").withStyle(ChatFormatting.GRAY);
-            MutableComponent label = I18n.page(i);
+            if (tag == null)
+                continue;
 
-            if (names[i] != null)
-                label = names[i].append("\n").append(label.withStyle(ChatFormatting.GRAY));
-
-            label = Component.empty().append(prefix).append(label);
-            widgets[i - start] = new Widget(label, Items.PAPER, new SwitchPageAction(i + 1));
+            widgets[i - start] = createPageWidget(names[i], tag, page, start);
         }
 
         return widgets;
+    }
+
+    private static Widget createPageWidget(@Nullable MutableComponent name, @Nullable CompoundTag iotas, int page, int offset) {
+        MutableComponent label = I18n.numbered(page - offset, I18n.page(name, page));
+        Item icon = name != null ? WheelClientConfig.getIconOr(name.getString(), Items.PAPER) : Items.PAPER;
+
+        if (iotas != null) {
+            Component displayIota = IotaType.getDisplay(iotas);
+            label.append("\n").append(Component.translatable("hexcasting.spelldata.onitem", displayIota));
+        }
+
+        return new Widget(label, icon, new SwitchPageAction(page));
     }
 }

@@ -27,20 +27,6 @@ public final class SpellWheelClient {
         return null;
     }
 
-    public static boolean[] getRealPages(ItemStack spellBook) {
-        CompoundTag data = NBTHelper.getCompound(spellBook, ItemSpellbook.TAG_PAGES);
-
-        int shiftedIdx = Math.max(1, ItemSpellbook.highestPage(spellBook));
-        boolean[] result = new boolean[shiftedIdx];
-
-        for (int i = 1; i < shiftedIdx + 1; i++) {
-            String nameKey = String.valueOf(i);
-            result[i - 1] = data.contains(nameKey);
-        }
-
-        return result;
-    }
-
     public static MutableComponent[] getPageNames(ItemStack spellBook) {
         CompoundTag names = NBTHelper.getCompound(spellBook, ItemSpellbook.TAG_PAGE_NAMES);
         int shiftedIdx = Math.max(1, ItemSpellbook.highestPage(spellBook));

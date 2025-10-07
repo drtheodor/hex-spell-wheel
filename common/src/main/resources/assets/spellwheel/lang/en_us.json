@@ -1,5 +1,6 @@
 {
   "widget.spellwheel.page": "Page %s",
+  "widget.spellwheel.page.suffix": " (p. %s)",
   "widget.spellwheel.chapter": "Chapter %s",
   "widget.spellwheel.empty": "Empty",
   "widget.spellwheel.empty.desc": "Not assigned.",
