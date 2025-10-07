@@ -12,11 +12,14 @@ public class IconChangeAction implements Action {
 
     private final Component name;
     private final Item defIcon;
+    private final int confirmColor;
+
     private boolean primed;
 
-    public IconChangeAction(Component name, Item defIcon) {
+    public IconChangeAction(Component name, Item defIcon, int confirmColor) {
         this.name = name;
         this.defIcon = defIcon;
+        this.confirmColor = confirmColor;
     }
 
     @Override
@@ -40,7 +43,7 @@ public class IconChangeAction implements Action {
         } else {
             client.player.displayClientMessage(I18n.youSure(), true);
 
-            widget.setHoverColor(0x7f0000);
+            widget.setHoverColor(confirmColor);
             primed = true;
         }
     }
