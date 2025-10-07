@@ -71,8 +71,8 @@ public class WheelClientConfig {
 
             StringBuilder result = new StringBuilder();
 
-            icons.forEach((s, item) -> result
-                    .append(s).append("\n").append(item.arch$registryName()));
+            icons.forEach((s, item) -> result.append(s).append('\n')
+                    .append(item.arch$registryName()).append('\n'));
 
             Files.writeString(CONFIG_PATH, result.toString());
         } catch (Exception e) {
