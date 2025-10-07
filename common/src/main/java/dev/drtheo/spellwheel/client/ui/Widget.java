@@ -15,7 +15,7 @@ public final class Widget {
 
     private static final ItemStack EMPTY_STACK = new ItemStack(Items.BARRIER);
 
-    public static final int DEFAULT_COLOR = 0x2c2c2c;
+    public static final int NORMAL_COLOR = 0x2c2c2c;
     public static final int HOVER_COLOR = 0x3c8527;
 
     private final Component label;
@@ -24,7 +24,7 @@ public final class Widget {
     private final Action actions;
     private final boolean keepOpened;
 
-    private int currentColor = DEFAULT_COLOR;
+    private int normalColor = NORMAL_COLOR;
     private int hoverColor = HOVER_COLOR;
 
     public Widget(Component label, ItemStack preview, Action actions, boolean keepOpened) {
@@ -78,15 +78,15 @@ public final class Widget {
     }
 
     public int currentColor() {
-        return currentColor;
+        return normalColor;
     }
 
     public int hoverColor() {
         return hoverColor;
     }
 
-    public void setCurrentColor(int currentColor) {
-        this.currentColor = currentColor;
+    public void setNormalColor(int normalColor) {
+        this.normalColor = normalColor;
     }
 
     public void setHoverColor(int hoverColor) {

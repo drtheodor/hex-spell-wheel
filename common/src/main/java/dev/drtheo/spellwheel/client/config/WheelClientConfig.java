@@ -1,6 +1,7 @@
 package dev.drtheo.spellwheel.client.config;
 
 import dev.architectury.event.events.client.ClientLifecycleEvent;
+import dev.drtheo.spellwheel.SpellWheel;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
@@ -59,7 +60,7 @@ public class WheelClientConfig {
 
             return new WheelClientConfig(icons);
         } catch (Exception e) {
-            e.printStackTrace();
+            SpellWheel.LOGGER.error("Failed to read config", e);
             return new WheelClientConfig();
         }
     }
@@ -76,7 +77,7 @@ public class WheelClientConfig {
 
             Files.writeString(CONFIG_PATH, result.toString());
         } catch (Exception e) {
-            e.printStackTrace();
+            SpellWheel.LOGGER.error("Failed to save config", e);
         }
     }
 
