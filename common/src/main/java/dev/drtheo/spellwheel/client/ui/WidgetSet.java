@@ -11,6 +11,13 @@ public class WidgetSet {
         Arrays.fill(widgets, Widget.empty());
     }
 
+    public Widget get(int index) {
+        if (index < 0 || index > widgets.length - 1)
+            return null;
+
+        return widgets[index];
+    }
+
     public static WidgetSet create(Widget[] list) {
         WidgetSet set = new WidgetSet();
 
