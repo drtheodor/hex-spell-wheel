@@ -17,7 +17,7 @@ public class WheelOptionWidget extends Button {
     private final boolean hasIcon;
 
     protected WheelOptionWidget(int x, int y, Widget widget, int xOffset, int yOffset, int size, float anim, boolean hasIcon) {
-        super(x+(32 - size)/2, y+(32 - size)/2, size, size, Component.empty(), button -> { }, DEFAULT_NARRATION);
+        super(x + (32 - size) / 2, y + (32 - size) / 2, size, size, Component.empty(), button -> { }, DEFAULT_NARRATION);
 
         this.widget = widget;
         this.xOffset = xOffset;
@@ -59,8 +59,8 @@ public class WheelOptionWidget extends Button {
 
         int x = getX();
         int y = getY();
-        int contentX = x + width/4;
-        int contentY = y + height/4;
+        int contentX = x + (width - 16) / 2;
+        int contentY = y + (height - 16) / 2;
 
         context.fill(x, y, x + width, y + height, color);
 
@@ -79,7 +79,7 @@ public class WheelOptionWidget extends Button {
                     this.playDownSound(Minecraft.getInstance().getSoundManager());
 
                     if (i == 0) this.onPress();
-                    else this.onRightPress();
+                    else this.onAltPress();
 
                     return true;
                 }
@@ -89,7 +89,7 @@ public class WheelOptionWidget extends Button {
         return false;
     }
 
-    public void onRightPress() {
+    public void onAltPress() {
         Minecraft client = Minecraft.getInstance();
 
         if (client.screen instanceof WheelScreen wheelScreen)
